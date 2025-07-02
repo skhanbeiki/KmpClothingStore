@@ -3,7 +3,9 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
-        maven("https://maven.myket.ir")
+//        maven("https://maven.myket.ir")
+//        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://repo.ito.gov.ir/gradle/maven_central/")
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -18,7 +20,9 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        maven("https://maven.myket.ir")
+        maven("https://repo.ito.gov.ir/gradle/maven_central/")
+//        maven("https://maven.myket.ir")
+//        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
