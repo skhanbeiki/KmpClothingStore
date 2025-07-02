@@ -72,7 +72,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.ktor.client.darwin)
+//            implementation(libs.ktor.client.darwin)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
