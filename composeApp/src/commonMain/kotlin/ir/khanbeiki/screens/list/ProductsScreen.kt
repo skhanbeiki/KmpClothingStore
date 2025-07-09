@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -40,6 +41,7 @@ import ir.khanbeiki.data.models.Product
 import ir.khanbeiki.screens.detail.ProductDetailScreen
 
 class ProductsScreen : Screen {
+
     @Composable
     override fun Content() {
         val viewModel = getScreenModel<ProductsViewModel>()
