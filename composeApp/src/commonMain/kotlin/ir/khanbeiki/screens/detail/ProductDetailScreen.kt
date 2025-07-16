@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -29,16 +28,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import ir.khanbeiki.data.models.Product
+import kotlin.coroutines.cancellation.CancellationException
 
-data class ProductDetailScreen(val productId: Int) : Screen {
+class ProductDetailScreen(val productId: Int) : Screen {
+
     @Composable
     override fun Content() {
-        val viewModel = getScreenModel<ProductDetailViewModel>()
+        val viewModel = koinScreenModel<ProductDetailViewModel>()
+
         val navigator = LocalNavigator.currentOrThrow
         val product by viewModel.product.collectAsState()
         val isLoading by viewModel.isLoading.collectAsState()
@@ -46,7 +48,11 @@ data class ProductDetailScreen(val productId: Int) : Screen {
 
         LaunchedEffect(productId) {
             if (product?.id != productId) {
-                viewModel.loadProduct(productId)
+                try {
+                    viewModel.loadProduct(productId)
+                } catch (e: CancellationException) {
+                    e.printStackTrace()
+                }
             }
         }
 

@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 interface ApiService {
     suspend fun getAllProducts(): List<Product>
     suspend fun getProductById(id: Int): Product
+    suspend fun fetchCategories(): List<String>
 }
 
 class ApiServiceImpl(private val client: HttpClient) : ApiService {
@@ -20,6 +21,10 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
 
     override suspend fun getProductById(id: Int): Product {
         return client.get("https://fakestoreapi.com/products/$id").body()
+    }
+
+    override suspend fun fetchCategories(): List<String> {
+        return client.get("https://fakestoreapi.com/products/categories").body()
     }
 }
 
