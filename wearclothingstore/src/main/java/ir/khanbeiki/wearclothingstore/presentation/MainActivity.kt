@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.tooling.preview.devices.WearDevices
+import ir.khanbeiki.screens.list.ProductsViewModel
 import ir.khanbeiki.wearclothingstore.presentation.theme.KmpClothingStoreTheme
 
 class MainActivity : ComponentActivity() {
