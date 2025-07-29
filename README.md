@@ -152,4 +152,4 @@ MIT License – feel free to fork, use, and contribute!
 ## 👤 Author
 
 Developed by \[Moslem Khanbeiki]
-GitHub: [github.com/yourusername](https://github.com/skhanbeiki/)
+GitHub: [KHANBEIKI](https://github.com/skhanbeiki/)
