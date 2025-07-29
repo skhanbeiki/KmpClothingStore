@@ -44,6 +44,7 @@ import ir.khanbeiki.data.models.Product
 import ir.khanbeiki.screens.detail.ProductDetailScreen
 import ir.khanbeiki.them.AppColors
 import ir.khanbeiki.them.AppStrings
+import ir.khanbeiki.utils.isWatchDevice
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -73,43 +74,85 @@ class ProductsScreen : Screen {
             }
         }
 
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(AppStrings.APP_NAME) },
-                    backgroundColor = AppColors.Primary
-                )
-            }
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                when {
-                    isLoading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-
-                    error != null -> {
-                        Text(
-                            text = "Error: $error",
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-
-                    else -> {
-                        Column(modifier = Modifier.fillMaxSize().background(AppColors.Background)) {
-                            CategoryHorizontalList(category)
-
-                            ProductList(
-                                products = products,
-                                onItemClick = { product ->
-                                    navigator.push(ProductDetailScreen(product.id))
-                                }
+        if (isWatchDevice()) {
+            Scaffold { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    when {
+                        isLoading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center)
                             )
+                        }
+
+                        error != null -> {
+                            Text(
+                                text = "Error: $error",
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+
+                        else -> {
+                            Column(
+                                modifier = Modifier.fillMaxSize().background(AppColors.Background)
+                            ) {
+                                CategoryHorizontalList(category)
+
+                                ProductList(
+                                    products = products,
+                                    onItemClick = { product ->
+                                        navigator.push(ProductDetailScreen(product.id))
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text(AppStrings.APP_NAME) },
+                        backgroundColor = AppColors.Primary
+                    )
+                }
+            ) { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    when {
+                        isLoading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+
+                        error != null -> {
+                            Text(
+                                text = "Error: $error",
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+
+                        else -> {
+                            Column(
+                                modifier = Modifier.fillMaxSize().background(AppColors.Background)
+                            ) {
+                                CategoryHorizontalList(category)
+
+                                ProductList(
+                                    products = products,
+                                    onItemClick = { product ->
+                                        navigator.push(ProductDetailScreen(product.id))
+                                    }
+                                )
+                            }
                         }
                     }
                 }

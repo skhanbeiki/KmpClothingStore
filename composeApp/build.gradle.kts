@@ -54,7 +54,6 @@ kotlin {
                 }
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
                         add(rootDirPath)
                         add(projectDirPath)
                     }
@@ -66,7 +65,6 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-        val wasmJsMain by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
@@ -115,6 +113,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
         }
+
         wasmJsMain.dependencies {
             implementation("io.ktor:ktor-client-js:3.1.3")
         }
@@ -158,7 +157,13 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ir.khanbeiki"
-            packageVersion = "1.0.4"
+            packageVersion = "1.0.6"
+
+            windows {
+                iconFile.set(project.file("src/desktopMain/resources/icon.ico"))
+                menuGroup = "Kmp Clothing Store"
+                shortcut = true
+            }
         }
     }
 }
