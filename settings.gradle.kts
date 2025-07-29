@@ -39,4 +39,4 @@ plugins {
 }
 
 include(":composeApp")
-include(":wearclothingstore")
+//include(":wearclothingstore")

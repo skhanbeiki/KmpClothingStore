@@ -1,7 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 
@@ -26,8 +26,8 @@ kotlin {
         iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
-        watchosArm32(),
-        watchosArm64()
+//        watchosArm32(),
+//        watchosArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
@@ -35,7 +35,11 @@ kotlin {
         }
     }
 
-    jvm("desktop")
+    jvm("desktop") {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -45,6 +49,9 @@ kotlin {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
+                cssSupport {
+                    enabled = true
+                }
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
@@ -59,12 +66,18 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+        val wasmJsMain by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
         }
+
+        iosMain.dependencies {
+            implementation("io.ktor:ktor-client-darwin:3.1.3")
+        }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -90,14 +103,20 @@ kotlin {
             implementation("cafe.adriel.voyager:voyager-navigator:1.1.0-beta03")
             implementation("cafe.adriel.voyager:voyager-koin:1.1.0-beta03")
             implementation("cafe.adriel.voyager:voyager-transitions:1.1.0-beta03")
+
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+
         desktopMain.dependencies {
+            implementation("io.ktor:ktor-client-cio:3.1.3")
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+        }
+        wasmJsMain.dependencies {
+            implementation("io.ktor:ktor-client-js:3.1.3")
         }
     }
 }
@@ -139,7 +158,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ir.khanbeiki"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.4"
         }
     }
 }

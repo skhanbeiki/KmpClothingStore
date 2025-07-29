@@ -1,15 +1,9 @@
 package ir.khanbeiki.data
 
 import io.ktor.client.HttpClient
-import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
-import io.ktor.serialization.kotlinx.json.json
 import ir.khanbeiki.data.models.Product
-import kotlinx.serialization.json.Json
-import org.koin.core.KoinApplication.Companion.init
 
 interface ApiService {
     suspend fun getAllProducts(): List<Product>
@@ -31,16 +25,4 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
     }
 }
 
-fun createHttpClient(): HttpClient {
-    return HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-                isLenient = true
-            })
-        }
-
-
-    }
-}
+expect fun createHttpClient(): HttpClient
