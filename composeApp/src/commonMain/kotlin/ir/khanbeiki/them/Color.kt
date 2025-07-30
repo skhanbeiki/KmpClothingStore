@@ -3,20 +3,25 @@ package ir.khanbeiki.them
 import androidx.compose.ui.graphics.Color
 
 object AppColors {
-    val Primary = Color(0xFF6200EE)
+
+    val Primary = Color(0xFF4A90E2)
+    val OnPrimary = Color.White
+    val Background = Color(0xFFF7F9FC)
+    val OnBackground = Color(0xFF1A1A1A)
+    val CardBackground = Color.White
+    val ChipBackground = Color(0xFFE0E0E0)
+    val TextSecondary = Color(0xFF666666)
+
     val PrimaryVariant = Color(0xFF3700B3)
     val Secondary = Color(0xFF03DAC6)
     val SecondaryVariant = Color(0xFF018786)
 
-    val Background = Color(0xFFFFFFFF)
     val Surface = Color(0xFFFFFFFF)
 
     val Error = Color(0xFFB00020)
     val Success = Color(0xFF4CAF50)
 
-    val OnPrimary = Color(0xFFFFFFFF)
     val OnSecondary = Color(0xFF000000)
-    val OnBackground = Color(0xFF000000)
     val OnSurface = Color(0xFF000000)
     val OnError = Color(0xFFFFFFFF)
 

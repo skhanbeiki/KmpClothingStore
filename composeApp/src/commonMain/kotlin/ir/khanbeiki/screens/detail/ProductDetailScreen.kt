@@ -38,6 +38,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import ir.khanbeiki.data.models.Product
+import ir.khanbeiki.them.AppColors
 import kotlin.coroutines.cancellation.CancellationException
 
 class ProductDetailScreen(val productId: Int) : Screen {
@@ -65,6 +66,8 @@ class ProductDetailScreen(val productId: Int) : Screen {
             topBar = {
                 TopAppBar(
                     title = { Text("Product Details") },
+                    backgroundColor = AppColors.Primary,
+                    contentColor = AppColors.OnPrimary,
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(Icons.Default.Close, "Back")

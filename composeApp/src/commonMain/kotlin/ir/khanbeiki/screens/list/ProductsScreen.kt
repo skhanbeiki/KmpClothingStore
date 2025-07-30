@@ -2,38 +2,18 @@ package ir.khanbeiki.screens.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material3.CardDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -57,59 +37,53 @@ class ProductsScreen : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
         val products by viewModel.products.collectAsState()
-        val category by viewModel.category.collectAsState()
+        val categories by viewModel.category.collectAsState()
         val isLoading by viewModel.isLoading.collectAsState()
         val error by viewModel.error.collectAsState()
 
+        var selectedCategory by remember { mutableStateOf<String?>(null) }
+
         LaunchedEffect(Unit) {
             try {
-                if (products.isEmpty()) {
-                    viewModel.loadProducts()
-                }
-                if (category.isEmpty()) {
-                    viewModel.fetchCategories()
-                }
+                if (products.isEmpty()) viewModel.loadProducts()
+                if (categories.isEmpty()) viewModel.fetchCategories()
             } catch (e: CancellationException) {
                 e.printStackTrace()
             }
         }
 
+        val content: @Composable () -> Unit = {
+            when {
+                isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+
+                error != null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Error: $error")
+                }
+
+                else -> Column(modifier = Modifier.fillMaxSize().background(AppColors.Background)) {
+                    CategoryHorizontalList(
+                        categories = categories,
+                        selectedCategory = selectedCategory,
+                        onCategorySelected = {
+                            selectedCategory = it
+                            viewModel.loadProducts()
+                        }
+                    )
+
+                    ProductList(
+                        products = products,
+                        onItemClick = { product -> navigator.push(ProductDetailScreen(product.id)) }
+                    )
+                }
+            }
+        }
+
         if (isWatchDevice()) {
-            Scaffold { paddingValues ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    when {
-                        isLoading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-
-                        error != null -> {
-                            Text(
-                                text = "Error: $error",
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-
-                        else -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize().background(AppColors.Background)
-                            ) {
-                                CategoryHorizontalList(category)
-
-                                ProductList(
-                                    products = products,
-                                    onItemClick = { product ->
-                                        navigator.push(ProductDetailScreen(product.id))
-                                    }
-                                )
-                            }
-                        }
-                    }
+            Scaffold { padding ->
+                Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    content()
                 }
             }
         } else {
@@ -117,44 +91,13 @@ class ProductsScreen : Screen {
                 topBar = {
                     TopAppBar(
                         title = { Text(AppStrings.APP_NAME) },
-                        backgroundColor = AppColors.Primary
+                        backgroundColor = AppColors.Primary,
+                        contentColor = AppColors.OnPrimary
                     )
                 }
-            ) { paddingValues ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    when {
-                        isLoading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-
-                        error != null -> {
-                            Text(
-                                text = "Error: $error",
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-
-                        else -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize().background(AppColors.Background)
-                            ) {
-                                CategoryHorizontalList(category)
-
-                                ProductList(
-                                    products = products,
-                                    onItemClick = { product ->
-                                        navigator.push(ProductDetailScreen(product.id))
-                                    }
-                                )
-                            }
-                        }
-                    }
+            ) { padding ->
+                Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    content()
                 }
             }
         }
@@ -165,7 +108,8 @@ class ProductsScreen : Screen {
 fun ProductList(products: List<Product>, onItemClick: (Product) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         items(products) { product ->
             ProductItem(product = product, onItemClick = onItemClick)
@@ -178,31 +122,34 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(horizontal = 16.dp)
             .clickable { onItemClick(product) },
-        elevation = 4.dp,
-        shape = RoundedCornerShape(8.dp)
+        elevation = 8.dp,
+        shape = RoundedCornerShape(16.dp),
+        backgroundColor = AppColors.CardBackground
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
                 model = product.image,
                 contentDescription = "Product image",
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Column {
                 Text(
                     text = product.title,
-                    style = MaterialTheme.typography.body1,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.h6,
+                    color = AppColors.OnBackground,
                     maxLines = 1
                 )
 
@@ -210,9 +157,9 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
 
                 Text(
                     text = "$${product.price}",
-                    style = MaterialTheme.typography.body2,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colors.primary
+                    style = MaterialTheme.typography.body1,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    color = AppColors.Primary
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -220,7 +167,7 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
                 Text(
                     text = product.category,
                     style = MaterialTheme.typography.caption,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                    color = AppColors.TextSecondary
                 )
             }
         }
@@ -228,40 +175,36 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
 }
 
 @Composable
-fun CategoryHorizontalList(categories: List<String>) {
+fun CategoryHorizontalList(
+    categories: List<String>,
+    selectedCategory: String?,
+    onCategorySelected: (String) -> Unit
+) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         items(categories) { category ->
-            CategoryItem(category = category)
-        }
-    }
-}
+            val isSelected = category == selectedCategory
 
-@Composable
-fun CategoryItem(category: String) {
-    androidx.compose.material3.Card(
-        modifier = Modifier
-            .width(120.dp)
-            .height(48.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = AppColors.Primary,
-            contentColor = AppColors.OnPrimary
-        )
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                color = AppColors.Background,
-                text = category,
-                maxLines = 1
-            )
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(
+                        if (isSelected) AppColors.Primary else AppColors.ChipBackground
+                    )
+                    .clickable { onCategorySelected(category) }
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = category,
+                    color = if (isSelected) AppColors.OnPrimary else AppColors.OnBackground,
+                    style = MaterialTheme.typography.body2
+                )
+            }
         }
     }
 }
