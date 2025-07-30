@@ -19,7 +19,7 @@ This project builds and runs on:
 
 ## 📱 Screenshots
 
-*Coming soon...*
+ ![alt text](https://github.com/skhanbeiki/KmpClothingStore/blob/main/img.jpg)
 
 ---
 
